@@ -111,14 +111,14 @@ extern "C" {
  * incorporate various methods to protect full playback pipeline. These methods
  * of protection could be SW based or HW based. The SW based protection
  * mechanism of DRMs is called SWDRM while HW based protection mechanism is
- * called HWDRM. There is no existing support in LibVA to support either DRM
+ * called HWDRM. There is no previous support in LibVA to support either DRM
  * mechanism.
  *
- * The LibVA Protected APIs are proposed to enable DRM capabilities. The
- * proposal inolves creation of protected session to communicate with TEE and
- * then using these protected sessions to process video/audio data. The
- * philophashy behind proposal of these API is to leverage existing LibVA
- * infrastructure as much as possible.
+ * The LibVA Protected APIs are to enable DRM capabilities. The proposal
+ * inolves creation of protected session to communicate with TEE and then using
+ * these protected sessions to process video/audio data. The philophashy behind
+ * proposal of these API is to leverage existing LibVA infrastructure as much
+ * as possible.
  *
  * \section description Detailed Description
  * The Protected content API provides a general mechanism for opening protected
