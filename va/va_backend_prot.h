@@ -70,13 +70,6 @@ struct VADriverVTableProt {
         VABufferID buf_id
     );
 
-    VAStatus
-    (*vaProtectedSessionHwUpdate)(
-        VADriverContextP ctx,
-        VAProtectedSessionID protected_session,
-        VABufferID buf_id
-    );
-
     /** \brief Reserved bytes for future use, must be zero */
     unsigned long reserved[VA_PADDING_MEDIUM];
 };

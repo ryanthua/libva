@@ -78,31 +78,31 @@ extern "C" {
  *
  * \section DRM Pipeline
  * The most of DRM standards execute following deep pipeline to playback
- * contents on client systems from streaming serveres - provisioning uses
- * provisioning servers, licence aquasition uses license server, video
- * bitstream delivery uses content server and decryption/decoding, audio
- * bitstream delivery uses content server and decyption/playback,
+ * contents on client systems from streaming servers - provisioning uses
+ * provisioning servers, licence aquasition uses license servers, video
+ * bitstream delivery uses content servers and decryption/decoding, audio
+ * bitstream delivery uses content servers and decyption/playback,
  * display/playback.
  *
  * \section LibVA Protected Content APIs
  * The most of DRM standards execute following deep pipeline to playback
- * contents on client systems from streaming serveres - provisioning uses
- * provisioning servers, licence aquasition uses license server, video
- * bitstream delivery uses content server and decryption/decoding, audio
- * bitstream delivery uses content server and decyption/playback,
+ * contents on client systems from streaming servers - provisioning uses
+ * provisioning servers, licence aquasition uses license servers, video
+ * bitstream delivery uses content servers and decryption/decoding, audio
+ * bitstream delivery uses content servers and decyption/playback,
  * display/playback.
  *
  * The Provisioning and License Aquasition implementations are Independent
  * Hardware Vendor (IHV) specific but most IHVs use some form of Trusted
  * Execution Environment (TEE) to prepare client platform or system for DRM
- * content playback. The provisioning operations use provisioning server (as
+ * content playback. The provisioning operations use provisioning servers (as
  * instructed in DRM standard) and client system TEE. The communication between
- * provisioning server and client system TEE uses asymmetic cryptographic
+ * provisioning servers and client system TEE uses asymmetic cryptographic
  * mechanism. This step provides a way to establish root-of-trust between
  * client system and streaming servers. Once root-of-trust is established then
  * client system requests for license aquasition for a particular streaming
  * title. The license aquasition involves communication between licensing
- * server and TEE using asymmetic cryptographic mechanism. At end of this step,
+ * servers and TEE using asymmetic cryptographic mechanism. At end of this step,
  * client system TEE has required assets to decrypt/decode. Although these
  * communication does not direcly involve video aspect of GPU but **facilitate
  * GPU required assets to playback premium contents**.
