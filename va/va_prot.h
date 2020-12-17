@@ -82,8 +82,11 @@ extern "C" {
  * provisioning servers, licence aquasition uses license servers, video
  * bitstream delivery uses content servers and decryption/decoding, audio
  * bitstream delivery uses content servers and decyption/playback,
- * display/playback.
- *
+ * display/playback. The system level HWDRM sequence diagram is following -
+ * https://user-images.githubusercontent.com/75039699/102427278-df284e80-3fc5-11eb-9a3e-129b5f6b567a.png
+ * and HWDRM pipeline view is following -
+ * https://user-images.githubusercontent.com/75039699/102427357-04b55800-3fc6-11eb-8b8c-f34fc44ec061.png
+ * 
  * \section LibVA Protected Content APIs
  * The most of DRM standards execute following deep pipeline to playback
  * contents on client systems from streaming servers - provisioning uses
@@ -114,10 +117,22 @@ extern "C" {
  * called HWDRM. There is no previous support in LibVA to support either DRM
  * mechanism.
  *
- * The LibVA Protected APIs are to enable DRM capabilities. It inolves creation
- * of protected session to communicate with TEE and then using these protected
- * sessions to process video/audio data. The philophashy behind these API is to
- * leverage existing LibVA infrastructure as much as possible.
+ * The LibVA Protected APIs are to enable DRM capabilities or facilitate isolated
+ * communicaiton with TEE. 
+ * VAEntrypointProtectedContent is to define interfaces for protected video playback 
+ * using HWDRM. This entry point co-ordinates assets across TEE/GPU/Display for 
+ * HWDRM playback. 
+ * The VAEntrypointProtectedTEEComm is to define interfaces for Application to 
+ * TEE direct communication to perform various TEE centric operations such as 
+ * standalone provisioning of platform at factory or provisioning TEE for other 
+ * usages, providing TEE capabilities etc. 
+ * The difference between VAEntrypointProtectedContent/VAEntrypointProtectedTEEComm 
+ * is that VAEntrypointProtectedContent does not provide isolated entry point 
+ * for TEE and invokes TEE only from HWDRM perspective.
+ * For DRM capabilities, APIs inolve creation of protected session to communicate 
+ * with TEE and then using these protected sessions to process video/audio data. 
+ * The philophashy behind these API is to leverage existing LibVA infrastructure 
+ * as much as possible.
  *
  * \section description Detailed Description
  * The Protected content API provides a general mechanism for opening protected
@@ -212,6 +227,11 @@ extern "C" {
  *
  * \section api_pc_setup Set up a protected content session
  *
+ * TEE Communication Entrypoint
+ * The protected content session provides a TEE session that is used to extract 
+ * TEE information. This information could be used to peform TEE operations. 
+
+ * Protected Content Entrypoint
  * The protected content session can be attached to VA decode/encode/vp context
  * to do decryption/protection in the pipeline.
  * Before creating a protected content session, it needs to create a config
@@ -245,21 +265,26 @@ extern "C" {
  *
  * \section api_pc_exec TEE communication via vaProtectedSessionExecute()
  *
- * Before start decryption/encryption, we may need to communicate with TEE to
- * get encrypted decryption. We need to call vaProtectedSessionExecute() to
- * get it. The following pseudo-code demonstrates getting session id via
- * vaProtectedSessionExecute() as an example.
+ * TEE Communication Entrypoint
+ * App needs to communicate with TEE to get TEE information or prime TEE with 
+ * information that will be utilized for future TEE operations/tasks. 
+ * 
+ * Protected Content Entrypoint
+ * Before starting decryption/encryption operation in GPU, app may need to communicate 
+ * with TEE to get encrypted assets for priming HWDRM pipeline for decryption. App need 
+ * to call vaProtectedSessionExecute() to get this asset. The following pseudo-code 
+ * demonstrates getting session assets via vaProtectedSessionExecute() as an example.
  *
  * \code
  * uint32_t app_id = 0xFF;
  * VABufferID buffer;
  * VAProtectedSessionExecuteBuffer exec_buff = {0};
  *
- * exec_buff.function_id = GET_SESSION_ID
+ * exec_buff.function_id = GET_SESSION_ID;
  * exec_buff.input.data = nullptr;
  * exec_buff.input.data_size = 0;
  * exec_buff.output.data = &app_id;
- * exec_buff.output.max_data_size = (uint32_t);
+ * exec_buff.output.max_data_size = sizeof(app_id);
  * va_status = vaCreateBuffer(
  *                 va_dpy,
  *                 crypto_session,
