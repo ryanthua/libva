@@ -333,6 +333,7 @@ extern "C" {
  *     ...
  *     vaRenderPicture(va_dpy, decode_ctx, &buf_id1, 1);
  *     vaRenderPicture(va_dpy, decode_ctx, &buf_id2, 1);
+ *     vaRenderPicture(va_dpy, decode_ctx, &buf_id_enc_param, 1);
  *     ...
  *     vaEndPicture(va_dpy, decode_ctx);
  * }
@@ -350,6 +351,7 @@ extern "C" {
  *     ...
  *     vaRenderPicture(va_dpy, decode_ctx, &buf_id1, 1);
  *     vaRenderPicture(va_dpy, decode_ctx, &buf_id2, 1);
+ *     vaRenderPicture(va_dpy, decode_ctx, &buf_id_enc_param, 1);
  *     ...
  *     vaEndPicture(va_dpy, decode_ctx);
  *
@@ -359,6 +361,10 @@ extern "C" {
  *     // check encrypted variable for next frame
  * }
  * \endcode
+ *
+ * In above examples, the buf_id_enc_param is the buffer of type
+ * VAEncryptionParameters which is VA buffer type
+ * VAEncryptionParameterBufferType.
  */
 
 /**
