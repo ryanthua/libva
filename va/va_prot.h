@@ -285,6 +285,10 @@ extern "C" {
  * to call vaProtectedSessionExecute() to get this asset. The following pseudo-code 
  * demonstrates getting session assets via vaProtectedSessionExecute() as an example.
  *
+ * In this example, the vaCreateBuffer is called with exec_buffer mainly becasue TEE 
+ * Communication Entrypoint buffers are CPU bound and buffer size is small enough to 
+ * have extra copy operation without impacting performance. 
+ * 
  * \code
  * uint32_t app_id = 0xFF;
  * VABufferID buffer;
