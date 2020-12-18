@@ -88,6 +88,21 @@ extern "C" {
  * https://user-images.githubusercontent.com/75039699/102427357-04b55800-3fc6-11eb-8b8c-f34fc44ec061.png
  * 
  * \section LibVA Protected Content APIs
+ * The LibVA Protected APIs are designed to enable DRM capabilities or 
+ * facilitate isolated communicaiton with TEE. 
+ * The VAEntrypointProtectedTEEComm is to define interfaces for Application 
+ * to TEE direct communication to perform various TEE centric operations 
+ * such as standalone provisioning of platform at factory or provisioning 
+ * TEE for other usages, providing TEE capabilities etc.
+ * The VAEntrypointProtectedContent is to define interfaces for protected 
+ * video playback using HWDRM. This entry point co-ordinates assets across 
+ * TEE/GPU/Display for HWDRM playback. 
+ * 
+ * The difference between Protected Content and Protected TEE Communication 
+ * is that Protected Content Entrypoint does not provide isolated entry 
+ * point for TEE and invokes TEE only from HWDRM perspective.
+ * 
+ * Protected Content Entrypoint
  * The most of DRM standards execute following deep pipeline to playback
  * contents on client systems from streaming servers - provisioning uses
  * provisioning servers, licence aquasition uses license servers, video
@@ -111,56 +126,51 @@ extern "C" {
  * GPU required assets to playback premium contents**.
  *
  * To support DRM standard requirements in playback pipeline, OSes and HWs
- * incorporate various methods to protect full playback pipeline. These methods
- * of protection could be SW based or HW based. The SW based protection
- * mechanism of DRMs is called SWDRM while HW based protection mechanism is
- * called HWDRM. There is no previous support in LibVA to support either DRM
+ * incorporate various methods to protect full playback pipeline. These 
+ * methods of protection could be SW based or HW based. The SW based protection 
+ * mechanism of DRMs is called SWDRM while HW based protection mechanism is 
+ * called HWDRM. There is no previous support in LibVA to support either DRM 
  * mechanism.
- *
- * The LibVA Protected APIs are to enable DRM capabilities or facilitate isolated
- * communicaiton with TEE. 
- * VAEntrypointProtectedContent is to define interfaces for protected video playback 
- * using HWDRM. This entry point co-ordinates assets across TEE/GPU/Display for 
- * HWDRM playback. 
- * The VAEntrypointProtectedTEEComm is to define interfaces for Application to 
- * TEE direct communication to perform various TEE centric operations such as 
- * standalone provisioning of platform at factory or provisioning TEE for other 
- * usages, providing TEE capabilities etc. 
- * The difference between VAEntrypointProtectedContent/VAEntrypointProtectedTEEComm 
- * is that VAEntrypointProtectedContent does not provide isolated entry point 
- * for TEE and invokes TEE only from HWDRM perspective.
- * For DRM capabilities, APIs inolve creation of protected session to communicate 
- * with TEE and then using these protected sessions to process video/audio data. 
- * The philophashy behind these API is to leverage existing LibVA infrastructure 
- * as much as possible.
+ * 
+ * For DRM capabilities, APIs inolve creation of protected session to 
+ * communicate with TEE and then using these protected sessions to process 
+ * video/audio data. The philophashy behind these API is to leverage existing 
+ * LibVA infrastructure as much as possible.
+ * 
+ * Note:- TEE could be any secure HW device such as ME-FW or FPGA Secure 
+ * Enclave or NPU Secure Enclave. There are 2 concepts here – TEE Type such 
+ * as ME-FW or FPGA or NPU; TEE Type Client such as for AMT or HDCP or 
+ * something else etc.
  *
  * \section description Detailed Description
- * The Protected content API provides a general mechanism for opening protected
- * session with TEE and if required then priming GPU. The behavior of protected
- * session API depends on parameterization/configuration of protected session.
- * Just for TEE tasks, protected session is parameterized/configured as TEE
- * Communication while for HWDRM, protected session is parameterized/confgured
- * as Protected Content.
+ * The Protected content API provides a general mechanism for opening 
+ * protected session with TEE and if required then priming GPU/Display. 
+ * The behavior of protected session API depends on parameterization/
+ * configuration of protected session. Just for TEE tasks, protected 
+ * session is parameterized/configured as TEE Communication while for 
+ * HWDRM, protected session is parameterized/confgured as Protected 
+ * Content.
  *
- * With TEE Communication parameterization/confguration, client executes TEE
- * workloads in TEE with TEE Communication protected session.
+ * TEE Communication Entrypoint
+ * With TEE Communication parameterization/confguration, client 
+ * executes TEE workloads in TEE with TEE Communication protected 
+ * session.
  *
- * With Protected Content parameterization/confguration, client executes HWDRM
- * playback workloads HW accelerating protected video content
- * decryption/decoding with protected content session.
+ * Protected Content Entrypoint
+ * With Protected Content parameterization/confguration, client 
+ * executes HWDRM playback workloads HW accelerating protected video 
+ * content decryption/decoding with protected content session.
  *
- * TEE could be any secure HW device such as ME-FW or FPGA Secure Enclave or
- * NPU Secure Enclave. There are 2 concepts here – TEE Type such as ME-FW or
- * FPGA or NPU; TEE Type Client such as for ME-FW PAVP or AMT or HDCP etc.
- * Protected session represents session object that has all security
+ * Before calling vaCreateProtectedSession, VAConfigID is obtained using 
+ * existing libva mechanism to determine configuration parameters of 
+ * protected session. The VAConfigID is determined in this way so that 
+ * Protected Session implementation aligns with existing libva implementation. 
+ * After obtaining VAConfigID, Protected Session needs to be created but 
+ * note this is a session and not a context. Refer VAProtectedSessionID 
+ * for more details.
+ * 
+ * Note:- Protected session represents session object that has all security
  * information needed for Secure Enclave to operate certain operations.
- *
- * Before calling vaCreateProtectedSession, VAConfigID is obtained using libva
- * mechanism to determine configuration parameters of protected session. The
- * VAConfigID is determined in this way so that Protected Session implementation
- * aligns with existing libva implementation. After obtaining VAConfigID,
- * Protected Session needs to be created but note this is a session and not a
- * context. Refer VAProtectedSessionID for more details.
  *
  * Protected content API uses the following paradigm for protected content
  * session:
@@ -303,8 +313,14 @@ extern "C" {
  * context which want to enable/disable decryption/protection
  *
  * Protected content session is attached to VA decode/encode/vp context to
- * enable decryption/protection. It could do attaching before decoding/encoding
- * each frame and detach after each frame processed
+ * enable protected decoding/encoding/video processing per frame or entire
+ * stream. If protected session attached per frame then application has 2 
+ * options for decoding/encoding skip processing i.e. accomodating clear
+ * frames - 1. Application could do detach after each frame is processed 
+ * to process clear frame 2. Application could remains attached to decode/
+ * encode session but specify enryption byte length to 0. 
+ * The video processing does not has option #2 mainly because API does 
+ * not provide skip processing.
  *
  * \code
  * vaAttachProtectedSession(va_dpy, decode_ctx, crypto_session);
