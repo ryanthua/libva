@@ -83,9 +83,9 @@ extern "C" {
  * bitstream delivery uses content servers and decryption/decoding, audio
  * bitstream delivery uses content servers and decyption/playback,
  * display/playback. The system level HWDRM sequence diagram is following -
- * https://user-images.githubusercontent.com/75039699/102427278-df284e80-3fc5-11eb-9a3e-129b5f6b567a.png
+ * ![HWDRM sequence diagram](https://user-images.githubusercontent.com/75039699/102427278-df284e80-3fc5-11eb-9a3e-129b5f6b567a.png)
  * and HWDRM pipeline view is following -
- * https://user-images.githubusercontent.com/75039699/102427357-04b55800-3fc6-11eb-8b8c-f34fc44ec061.png
+ * ![HWDRM pipeline view](https://user-images.githubusercontent.com/75039699/102427357-04b55800-3fc6-11eb-8b8c-f34fc44ec061.png)
  * 
  * \section LibVA Protected Content APIs
  * The LibVA Protected APIs are designed to enable DRM capabilities or 
@@ -137,14 +137,14 @@ extern "C" {
  * video/audio data. The philophashy behind these API is to leverage existing 
  * LibVA infrastructure as much as possible.
  * 
- * Note:- TEE could be any secure HW device such as ME-FW or FPGA Secure 
- * Enclave or NPU Secure Enclave. There are 2 concepts here – TEE Type such 
+ * Note: TEE could be any secure HW device such as ME-FW or FPGA Secure
+ * Enclave or NPU Secure Enclave. There are 2 concepts here – TEE Type such
  * as ME-FW or FPGA or NPU; TEE Type Client such as for AMT or HDCP or 
  * something else etc.
  *
  * \section description Detailed Description
  * The Protected content API provides a general mechanism for opening 
- * protected session with TEE and if required then priming GPU/Display. 
+ * protected session with TEE and if required then \ref priming GPU/Display.
  * The behavior of protected session API depends on parameterization/
  * configuration of protected session. Just for TEE tasks, protected 
  * session is parameterized/configured as TEE Communication while for 
@@ -172,6 +172,14 @@ extern "C" {
  * Note:- Protected session represents session object that has all security
  * information needed for Secure Enclave to operate certain operations.
  *
+ * \subsection priming Priming
+ * Priming is used to refer various types of initializations. For example,
+ * if license acquisition is being performed then priming means that TEE is
+ * already provisioned aka TEE has some sort of "cryptographic" whitelist of
+ * servers that TEE will use to do license acquisition for video playback. If
+ * HWDRM video playback is being performed then priming means that HWDRM
+ * eco-system TEE/GPU/Display has proper keys to do proper video playback etc.
+ *
  * Protected content API uses the following paradigm for protected content
  * session:
  * - \ref api_pc_caps
@@ -179,7 +187,7 @@ extern "C" {
  * - \ref api_pc_exec
  * - \ref api_pc_attach
  *
- * \section api_pc_caps Query for supported cipher mode, block size, mode
+ * \subsection api_pc_caps Query for supported cipher mode, block size, mode
  *
  * Checking whether protected content is supported can be performed with
  * vaQueryConfigEntrypoints() and the profile argument set to
@@ -235,7 +243,7 @@ extern "C" {
  * }
  * \endcode
  *
- * \section api_pc_setup Set up a protected content session
+ * \subsection api_pc_setup Set up a protected content session
  *
  * TEE Communication Entrypoint
  * The protected content session provides a TEE session that is used to extract 
@@ -273,17 +281,19 @@ extern "C" {
  * CHECK_VASTATUS(va_status, "vaCreateProtectedSession");
  * \endcode
  *
- * \section api_pc_exec TEE communication via vaProtectedSessionExecute()
+ * \subsection api_pc_exec TEE communication via vaProtectedSessionExecute()
  *
  * TEE Communication Entrypoint
- * App needs to communicate with TEE to get TEE information or prime TEE with 
- * information that will be utilized for future TEE operations/tasks. 
+ * App needs to communicate with TEE to get TEE information or \ref priming
+ * "prime" TEE with  information that will be utilized for future TEE
+ * operations/tasks.
  * 
  * Protected Content Entrypoint
- * Before starting decryption/encryption operation in GPU, app may need to communicate 
- * with TEE to get encrypted assets for priming HWDRM pipeline for decryption. App need 
- * to call vaProtectedSessionExecute() to get this asset. The following pseudo-code 
- * demonstrates getting session assets via vaProtectedSessionExecute() as an example.
+ * Before starting decryption/encryption operation in GPU, app may need to
+ * communicate  with TEE to get encrypted assets for \ref priming HWDRM pipeline
+ * for decryption. App need to call vaProtectedSessionExecute() to get this
+ * asset. The following pseudo-code demonstrates getting session assets via
+ * vaProtectedSessionExecute() as an example.
  *
  * In this example, the vaCreateBuffer is called with exec_buffer mainly becasue TEE 
  * Communication Entrypoint buffers are CPU bound and buffer size is small enough to 
@@ -313,7 +323,7 @@ extern "C" {
  * vaDestroyBuffer(va_dpy, buffer);
  * \endcode
  *
- * \section api_pc_attach Attach/Detach protected content session to the VA
+ * \subsection api_pc_attach Attach/Detach protected content session to the VA
  * context which want to enable/disable decryption/protection
  *
  * Protected content session is attached to VA decode/encode/vp context to
@@ -333,6 +343,7 @@ extern "C" {
  *     ...
  *     vaRenderPicture(va_dpy, decode_ctx, &buf_id1, 1);
  *     vaRenderPicture(va_dpy, decode_ctx, &buf_id2, 1);
+ *     // Buffer holding encryption parameters, i.e. VAEncryptionParameterBufferType buffer
  *     vaRenderPicture(va_dpy, decode_ctx, &buf_id_enc_param, 1);
  *     ...
  *     vaEndPicture(va_dpy, decode_ctx);
@@ -351,6 +362,7 @@ extern "C" {
  *     ...
  *     vaRenderPicture(va_dpy, decode_ctx, &buf_id1, 1);
  *     vaRenderPicture(va_dpy, decode_ctx, &buf_id2, 1);
+ *     // Buffer holding encryption parameters, i.e. VAEncryptionParameterBufferType buffer
  *     vaRenderPicture(va_dpy, decode_ctx, &buf_id_enc_param, 1);
  *     ...
  *     vaEndPicture(va_dpy, decode_ctx);
@@ -361,10 +373,6 @@ extern "C" {
  *     // check encrypted variable for next frame
  * }
  * \endcode
- *
- * In above examples, the buf_id_enc_param is the buffer of type
- * VAEncryptionParameters which is VA buffer type
- * VAEncryptionParameterBufferType.
  */
 
 /**
