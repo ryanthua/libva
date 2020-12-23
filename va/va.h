@@ -916,35 +916,35 @@ typedef enum
      * \brief Cipher algorithm of the protected content session.
      *
      * This attribute specifies the cipher algorithm of the protected content session. It
-     * could be AES, etc....
+     * could be \c VA_PC_CIPHER_AES, etc....
      */
     VAConfigAttribProtectedContentCipherAlgorithm = 44,
     /**
      * \brief Cipher block size of the protected content session.
      *
      * This attribute specifies the block size of the protected content session. It could be
-     * 128, 192, or 256.
+     * \c VA_PC_BLOCK_SIZE_128, \c VA_PC_BLOCK_SIZE_192, or \c VA_PC_BLOCK_SIZE_256, etc....
      */
     VAConfigAttribProtectedContentCipherBlockSize = 45,
     /**
      * \brief Cipher mode of the protected content session.
      *
      * This attribute specifies the cipher mode of the protected content session. It could
-     * be CBC, CTR, etc...
+     * be \c VA_PC_CIPHER_MODE_CTR, \c VA_PC_CIPHER_MODE_CBC, etc...
      */
     VAConfigAttribProtectedContentCipherMode = 46,
     /**
      * \brief Decryption sample type of the protected content session.
      *
      * This attribute specifies the decryption sample type of the protected content session.
-     * It could be fullsample or subsample.
+     * It could be \c VA_PC_SAMPLE_TYPE_FULLSAMPLE or \c VA_PC_SAMPLE_TYPE_SUBSAMPLE.
      */
     VAConfigAttribProtectedContentCipherSampleType = 47,
     /**
      * \brief Special usage attribute of the protected session.
      *
      * The attribute specifies the flow for the protected session could be used. For
-     * example, it could be Widevine usages or something else.
+     * example, it could be \c VA_PC_USAGE_DEFAULT, \c VA_PC_USAGE_WIDEVINE, etc....
      */
     VAConfigAttribProtectedContentUsage = 48,
 
@@ -1335,6 +1335,10 @@ typedef union _VAConfigAttribValContextPriority{
 /** @name Attribute values for VAConfigAttribProtectedContentCipherBlockSize */
 /** \brief 128 bits block size */
 #define VA_PC_BLOCK_SIZE_128                0x00000001
+/** \brief 192 bits block size */
+#define VA_PC_BLOCK_SIZE_192                0x00000002
+/** \brief 256 bits block size */
+#define VA_PC_BLOCK_SIZE_256                0x00000004
 
 /** @name Attribute values for VAConfigAttribProtectedContentCipherMode */
 /** \brief AES CTR */
@@ -1979,7 +1983,10 @@ typedef enum
      */
     VAProtectedSessionExecuteBufferType = 59,
 
-    /** \brief Encryption parameters buffer for protected content session */
+    /** \brief Encryption parameters buffer for protected content session.
+     *
+     * Refer to \c VAEncryptionParameters
+    */
     VAEncryptionParameterBufferType = 60,
 
     VABufferTypeMax
@@ -2007,6 +2014,11 @@ typedef struct _VAContextParameterUpdateBuffer
     uint32_t reserved[VA_PADDING_MEDIUM];
 } VAContextParameterUpdateBuffer;
 
+/** \brief AES CTR encryption type */
+#define VA_ENCRYPTION_TYPE_CENC_CTR             0x00000001
+/** \brief AES CBC encryption type */
+#define VA_ENCRYPTION_TYPE_CENC_CBC             0x00000002
+
 /** \brief structure for encrypted segment info. */
 typedef struct _VAEncryptionSegmentInfo {
   /** \brief  The offset relative to the start of the bitstream input in
@@ -2019,16 +2031,18 @@ typedef struct _VAEncryptionSegmentInfo {
   uint32_t partial_aes_block_size;
   /** \brief  The length in bytes of the initial clear data */
   uint32_t init_byte_length;
-  /** \brief  This will be AES 128 counter for secure decode and secure
-   *  encode when numSegments equals 1 */
-  uint8_t aes_cbc_iv_or_ctr[16];
+  /** \brief  This will be AES counter for secure decode and secure encode
+   *  when numSegments equals 1 */
+  uint8_t aes_cbc_iv_or_ctr[64];
   /** \brief Reserved bytes for future use, must be zero */
   uint32_t va_reserved[VA_PADDING_MEDIUM];
 } VAEncryptionSegmentInfo;
 
 /** \brief Encryption parameters buffer for VAEncryptionParameterBufferType */
 typedef struct _VAEncryptionParameters {
-  /** \brief Encryption type, attribute values. */
+  /** \brief Encryption type, refer to \c VA_ENCRYPTION_TYPE_CENC_CTR or
+   * \c VA_ENCRYPTION_TYPE_CENC_CBC
+   */
   uint32_t encryption_type;
   /** \brief The number of sengments */
   uint32_t num_segments;
@@ -2041,16 +2055,22 @@ typedef struct _VAEncryptionParameters {
   /** \brief CENC counter length */
   uint32_t size_of_length;
   /** \brief Wrapped decrypt blob (Snd)kb */
-  uint8_t wrapped_decrypt_blob[16];
+  uint8_t wrapped_decrypt_blob[64];
   /** \brief Wrapped Key blob info (Sne)kb */
-  uint8_t wrapped_encrypt_blob[16];
+  uint8_t wrapped_encrypt_blob[64];
+  /** \brief key blob size
+   * It could be \c VA_PC_BLOCK_SIZE_128, \c VA_PC_BLOCK_SIZE_192, or
+   * \c VA_PC_BLOCK_SIZE_256
+   */
+  uint32_t key_blob_size;
   /** \brief Indicates the number of 16-byte BLOCKS that are encrypted in any
    *  given encrypted region of segments.
    *  If this value is zero:
    *    1. All bytes in encrypted region of segments are encrypted, i.e. the
    *       CENC or CBC1 scheme is being used
    *    2. blocks_stripe_clear must also be zero.
-   *  If this value is non-zero, blocks_stripe_clear must also be non-zero. */
+   *  If this value is non-zero, blocks_stripe_clear must also be non-zero.
+   */
   uint32_t blocks_stripe_encrypted;
   /** \brief Indicates the number of 16-byte BLOCKS that are clear in any given
    *  encrypted region of segments, as defined by the CENS and CBCS schemes in
