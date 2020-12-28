@@ -2022,9 +2022,9 @@ typedef struct _VAContextParameterUpdateBuffer
 /** \brief structure for encrypted segment info. */
 typedef struct _VAEncryptionSegmentInfo {
   /** \brief  The offset relative to the start of the bitstream input in
-   *  bytes of the start of the segment*/
+   *  bytes of the start of the segment */
   uint32_t segment_start_offset;
-  /** \brief  The length of the segments in bytes*/
+  /** \brief  The length of the segments in bytes */
   uint32_t segment_length;
   /** \brief  The length in bytes of the remainder of an incomplete block
    *  from a previous segment*/
@@ -2032,7 +2032,8 @@ typedef struct _VAEncryptionSegmentInfo {
   /** \brief  The length in bytes of the initial clear data */
   uint32_t init_byte_length;
   /** \brief  This will be AES counter for secure decode and secure encode
-   *  when numSegments equals 1 */
+   *  when numSegments equals 1, valid size is specified by
+   * \c key_blob_size */
   uint8_t aes_cbc_iv_or_ctr[64];
   /** \brief Reserved bytes for future use, must be zero */
   uint32_t va_reserved[VA_PADDING_MEDIUM];
@@ -2041,8 +2042,7 @@ typedef struct _VAEncryptionSegmentInfo {
 /** \brief Encryption parameters buffer for VAEncryptionParameterBufferType */
 typedef struct _VAEncryptionParameters {
   /** \brief Encryption type, refer to \c VA_ENCRYPTION_TYPE_CENC_CTR or
-   * \c VA_ENCRYPTION_TYPE_CENC_CBC
-   */
+   * \c VA_ENCRYPTION_TYPE_CENC_CBC */
   uint32_t encryption_type;
   /** \brief The number of sengments */
   uint32_t num_segments;
@@ -2054,9 +2054,11 @@ typedef struct _VAEncryptionParameters {
   uint32_t status_report_index;
   /** \brief CENC counter length */
   uint32_t size_of_length;
-  /** \brief Wrapped decrypt blob (Snd)kb */
+  /** \brief Wrapped decrypt blob (Snd)kb, valid size is specified by
+   * \c key_blob_size */
   uint8_t wrapped_decrypt_blob[64];
-  /** \brief Wrapped Key blob info (Sne)kb */
+  /** \brief Wrapped Key blob info (Sne)kb, valid size is specified by
+   * \c key_blob_size */
   uint8_t wrapped_encrypt_blob[64];
   /** \brief key blob size
    * It could be \c VA_PC_BLOCK_SIZE_128, \c VA_PC_BLOCK_SIZE_192, or
