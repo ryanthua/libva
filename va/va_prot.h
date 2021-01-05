@@ -43,16 +43,16 @@ extern "C" {
  * \section prolouge Prolouge
  * Video streaming is ubiquitous and the support for video streaming is widely
  * available across client open systems such as PCs, MACs, Chromebooks etc. and
- * closed systems such as setup-box, smart TVs, smart DVDs etc. By default,
+ * closed systems such as settop box, smart TVs, DVDs etc. By default,
  * video streaming is not considered premium due to various constraints such as
  * resolution, quality, production cost etc. but recently streaming of premium
  * video(1080p+) has become norm. The streaming of premium video in open systems
- * such as PCs, MACs, Chromebooks etc. make video particularly susceptible to
- * piracies (due to non-video playback usages of such systems) resulting in
- * millions of dollars loss to content creators.
+ * such as PCs, MACs, Chromebooks etc. makes video particularly susceptible to
+ * piracy (due to non-video playback usages of such systems) resulting in
+ * millions of dollars of loss to content creators.
  *
  * Digital Rights Management(DRM) has been proposed to stop piracy of premium
- * video streams across wide spectrum. There are some known open/closed DRM
+ * video streams across a wide spectrum. There are some known open/closed DRM
  * standards such as [Widevine by Google](https://www.widevine.com/),
  * [PlayReady by Microsoft](https://www.microsoft.com/playready/),
  * [FairPlay by Apple](https://developer.apple.com/streaming/fps/),
@@ -77,9 +77,9 @@ extern "C" {
  * while providing flexibility.
  *
  * \section DRM Pipeline
- * The most of DRM standards execute following deep pipeline to playback
+ * Most DRM standards execute the following deep pipeline to playback
  * contents on client systems from streaming servers - provisioning uses
- * provisioning servers, licence aquasition uses license servers, video
+ * provisioning servers, licence aquisition uses license servers, video
  * bitstream delivery uses content servers and decryption/decoding, audio
  * bitstream delivery uses content servers and decyption/playback,
  * display/playback. The system level HWDRM sequence diagram is following -
@@ -105,12 +105,12 @@ extern "C" {
  * Protected Content Entrypoint
  * The most of DRM standards execute following deep pipeline to playback
  * contents on client systems from streaming servers - provisioning uses
- * provisioning servers, licence aquasition uses license servers, video
+ * provisioning servers, licence aquisition uses license servers, video
  * bitstream delivery uses content servers and decryption/decoding, audio
  * bitstream delivery uses content servers and decyption/playback,
  * display/playback.
  *
- * The Provisioning and License Aquasition implementations are Independent
+ * The Provisioning and License aquisition implementations are Independent
  * Hardware Vendor (IHV) specific but most IHVs use some form of Trusted
  * Execution Environment (TEE) to prepare client platform or system for DRM
  * content playback. The provisioning operations use provisioning servers (as
@@ -118,8 +118,8 @@ extern "C" {
  * provisioning servers and client system TEE uses asymmetic cryptographic
  * mechanism. This step provides a way to establish root-of-trust between
  * client system and streaming servers. Once root-of-trust is established then
- * client system requests for license aquasition for a particular streaming
- * title. The license aquasition involves communication between licensing
+ * client system requests for license aquisition for a particular streaming
+ * title. The license aquisition involves communication between licensing
  * servers and TEE using asymmetic cryptographic mechanism. At end of this step,
  * client system TEE has required assets to decrypt/decode. Although these
  * communication does not direcly involve video aspect of GPU but **facilitate

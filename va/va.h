@@ -930,7 +930,7 @@ typedef enum
      * \brief Cipher mode of the protected content session.
      *
      * This attribute specifies the cipher mode of the protected content session. It could
-     * be \c VA_PC_CIPHER_MODE_CTR, \c VA_PC_CIPHER_MODE_CBC, etc...
+     * be \c VA_PC_CIPHER_MODE_ECB, \c VA_PC_CIPHER_MODE_CTR, \c VA_PC_CIPHER_MODE_CBC, etc...
      */
     VAConfigAttribProtectedContentCipherMode = 46,
     /**
@@ -1341,10 +1341,12 @@ typedef union _VAConfigAttribValContextPriority{
 #define VA_PC_BLOCK_SIZE_256                0x00000004
 
 /** @name Attribute values for VAConfigAttribProtectedContentCipherMode */
+/** \brief AES ECB */
+#define VA_PC_CIPHER_MODE_ECB               0x00000001
 /** \brief AES CTR */
-#define VA_PC_CIPHER_MODE_CTR               0x00000001
+#define VA_PC_CIPHER_MODE_CTR               0x00000002
 /** \brief AES CBC */
-#define VA_PC_CIPHER_MODE_CBC               0x00000002
+#define VA_PC_CIPHER_MODE_CBC               0x00000004
 
 /** @name Attribute values for VAConfigAttribProtectedContentCipherSampleType */
 /** \brief Full sample */
