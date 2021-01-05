@@ -2016,10 +2016,14 @@ typedef struct _VAContextParameterUpdateBuffer
     uint32_t reserved[VA_PADDING_MEDIUM];
 } VAContextParameterUpdateBuffer;
 
-/** \brief AES CTR encryption type */
-#define VA_ENCRYPTION_TYPE_CENC_CTR             0x00000001
-/** \brief AES CBC encryption type */
-#define VA_ENCRYPTION_TYPE_CENC_CBC             0x00000002
+/** \brief AES CTR fullsample encryption type */
+#define VA_ENCRYPTION_TYPE_FULLSAMPLE_CTR       0x00000001
+/** \brief AES CBC fullsample encryption type */
+#define VA_ENCRYPTION_TYPE_FULLSAMPLE_CBC       0x00000002
+/** \brief AES CTR fullsample encryption type */
+#define VA_ENCRYPTION_TYPE_SUBSAMPLE_CTR        0x00000004
+/** \brief AES CBC fullsample encryption type */
+#define VA_ENCRYPTION_TYPE_SUBSAMPLE_CBC        0x00000008
 
 /** \brief structure for encrypted segment info. */
 typedef struct _VAEncryptionSegmentInfo {
@@ -2043,16 +2047,17 @@ typedef struct _VAEncryptionSegmentInfo {
 
 /** \brief Encryption parameters buffer for VAEncryptionParameterBufferType */
 typedef struct _VAEncryptionParameters {
-  /** \brief Encryption type, refer to \c VA_ENCRYPTION_TYPE_CENC_CTR or
-   * \c VA_ENCRYPTION_TYPE_CENC_CBC */
+  /** \brief Encryption type, refer to \c VA_ENCRYPTION_TYPE_FULLSAMPLE_CTR,
+   * \c VA_ENCRYPTION_TYPE_FULLSAMPLE_CBC, \c VA_ENCRYPTION_TYPE_SUBSAMPLE_CTR,
+   * or \c VA_ENCRYPTION_TYPE_SUBSAMPLE_CBC
   uint32_t encryption_type;
   /** \brief The number of sengments */
   uint32_t num_segments;
   /** \brief Pointer of segments */
   VAEncryptionSegmentInfo *segment_info;
-  /** \brief The status report index for CENC workload.
-   *  The value is to indicate CENC workload and needs to be
-   *  different for each CENC workload */
+  /** \brief The status report index reserved for CENC fullsample workload.
+   * The related structures and definitions will upstream in the future.
+  */
   uint32_t status_report_index;
   /** \brief CENC counter length */
   uint32_t size_of_length;
